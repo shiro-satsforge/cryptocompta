@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CryptoCompta — écritures CHF pour vos transactions bitcoin</title>
+<meta name="description" content="CryptoCompta transforme les transactions d'un wallet bitcoin en écritures comptables CHF prêtes à importer dans Banana. Cours au moment de chaque paiement, frais réseau séparés, réévaluation au 31.12.">
+<style>
+:root{--ink:#1d2433;--muted:#5b6475;--line:#e3e6ec;--accent:#c8102e;--bg:#fafbfc}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:#fff}
+header,main,footer{max-width:880px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;padding-top:22px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.3px}.logo span{color:var(--accent)}
+.lang button{border:1px solid var(--line);background:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font:inherit;font-size:14px}
+.lang button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+h1{font-size:34px;line-height:1.2;margin:48px 0 12px;letter-spacing:-.5px}
+.lead{font-size:19px;color:var(--muted);margin:0 0 28px}
+h2{font-size:22px;margin:44px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--bg)}
+.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}th{background:var(--bg)}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:var(--muted)}
+ol li{margin-bottom:6px}
+.cta{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600}
+footer{border-top:1px solid var(--line);margin-top:60px;padding-top:20px;padding-bottom:40px;font-size:13px;color:var(--muted)}
+[data-l]{display:none}body.fr [data-l=fr],body.de [data-l=de]{display:block}
+body.fr span[data-l=fr],body.de span[data-l=de]{display:inline}
+</style>
+</head>
+<body class="fr">
+<header>
+  <div class="logo">Crypto<span>Compta</span></div>
+  <div class="lang"><button id="bfr" class="on" onclick="setL('fr')">FR</button> <button id="bde" onclick="setL('de')">DE</button></div>
+</header>
+<main>
+
+<section data-l="fr">
+  <h1>Vos transactions bitcoin, en écritures CHF prêtes à importer.</h1>
+  <p class="lead">CryptoCompta lit un wallet bitcoin et produit le journal comptable en CHF : cours au moment de chaque paiement, frais réseau séparés, réévaluation au 31.12. Import direct dans Banana Comptabilité ; CSV générique pour les autres logiciels.</p>
+  <a class="cta" href="mailto:shiro260926@gmail.com?subject=CryptoCompta%20-%20exemple%20d%27export">Recevoir un exemple d'export</a>
+
+  <h2>Pour qui</h2>
+  <div class="grid">
+    <div class="card"><h3>Fiduciaires</h3><p>Vos clients encaissent ou détiennent des bitcoins ? Évitez la saisie manuelle transaction par transaction.</p></div>
+    <div class="card"><h3>PME et indépendants</h3><p>Vous acceptez le bitcoin en direct (BTCPay, wallet propre) et devez tout passer en CHF dans votre comptabilité.</p></div>
+  </div>
+
+  <h2>Ce que fait l'outil</h2>
+  <div class="grid">
+    <div class="card"><h3>Lecture seule</h3><p>Il suffit d'une adresse ou de la clé publique étendue (xpub/zpub) du wallet. Elle permet de lire les transactions, jamais de dépenser.</p></div>
+    <div class="card"><h3>Cours horodaté</h3><p>Chaque encaissement et paiement est converti au cours BTC/CHF du moment de la transaction.</p></div>
+    <div class="card"><h3>Frais séparés</h3><p>Les frais réseau sont comptabilisés à part, et la monnaie rendue sur le wallet est reconnue comme interne.</p></div>
+    <div class="card"><h3>Clôture annuelle</h3><p>Solde d'ouverture au 1.1 et écriture de réévaluation au 31.12 selon la liste des cours de l'AFC.</p></div>
+  </div>
+
+  <h2>À quoi ressemble le résultat</h2>
+  <table>
+    <tr><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th class="n">CHF</th></tr>
+    <tr><td>14.03</td><td>Encaissement facture 2026-031, 0.00250000 BTC @ 68 400</td><td>1025 BTC</td><td>3200 Ventes</td><td class="n">171.00</td></tr>
+    <tr><td>02.05</td><td>Paiement fournisseur, 0.00120000 BTC @ 71 050</td><td>4400 Achats</td><td>1025 BTC</td><td class="n">85.26</td></tr>
+    <tr><td>02.05</td><td>Frais réseau, 0.00000850 BTC</td><td>6940 Frais</td><td>1025 BTC</td><td class="n">0.60</td></tr>
+    <tr><td>31.12</td><td>Réévaluation au cours AFC</td><td>1025 BTC</td><td>6950 Gain de change</td><td class="n">12.40</td></tr>
+  </table>
+  <p class="note">Exemple fictif à titre d'illustration. Comptes et plan comptable configurables.</p>
+
+  <h2>Comment ça se passe</h2>
+  <ol>
+    <li>Vous nous transmettez l'adresse ou la xpub du wallet (lecture seule) et la période.</li>
+    <li>Nous vous renvoyons le fichier d'import (Banana ou CSV) et un récapitulatif rapproché au sat près avec la blockchain.</li>
+    <li>Vous importez, vérifiez, c'est tout.</li>
+  </ol>
+  <p><strong>Phase pilote :</strong> les premiers dossiers sont traités gratuitement, en échange de votre retour.</p>
+
+  <h2>À propos</h2>
+  <p>CryptoCompta est développé par SatsForge, micro-entreprise numérique suisse. Les échanges sont menés par Shiro, un agent IA, sous supervision humaine. Aucune clé privée ni aucun accès permettant de dépenser n'est jamais demandé.</p>
+  <p>Contact : <a href="mailto:shiro260926@gmail.com">shiro260926@gmail.com</a></p>
+</section>
+
+<section data-l="de">
+  <h1>Ihre Bitcoin-Transaktionen als importfertige CHF-Buchungen.</h1>
+  <p class="lead">CryptoCompta liest eine Bitcoin-Wallet und erstellt das Buchungsjournal in CHF: Kurs im Zeitpunkt jeder Zahlung, Netzwerkgebühren separat, Bewertung per 31.12. Direktimport in Banana Buchhaltung; generisches CSV für andere Programme.</p>
+  <a class="cta" href="mailto:shiro260926@gmail.com?subject=CryptoCompta%20-%20Beispiel-Export">Beispiel-Export anfordern</a>
+
+  <h2>Für wen</h2>
+  <div class="grid">
+    <div class="card"><h3>Treuhänder</h3><p>Ihre Kunden nehmen Bitcoin ein oder halten Bitcoin? Schluss mit der manuellen Erfassung jeder einzelnen Transaktion.</p></div>
+    <div class="card"><h3>KMU und Selbständige</h3><p>Sie akzeptieren Bitcoin direkt (BTCPay, eigene Wallet) und müssen alles in CHF verbuchen.</p></div>
+  </div>
+
+  <h2>Was das Tool macht</h2>
+  <div class="grid">
+    <div class="card"><h3>Nur Lesezugriff</h3><p>Es genügt eine Adresse oder der erweiterte öffentliche Schlüssel (xpub/zpub). Damit lassen sich Transaktionen lesen, aber nie ausgeben.</p></div>
+    <div class="card"><h3>Kurs mit Zeitstempel</h3><p>Jede Einnahme und Zahlung wird zum BTC/CHF-Kurs im Zeitpunkt der Transaktion umgerechnet.</p></div>
+    <div class="card"><h3>Gebühren separat</h3><p>Netzwerkgebühren werden separat verbucht, Wechselgeld innerhalb der Wallet wird als intern erkannt.</p></div>
+    <div class="card"><h3>Jahresabschluss</h3><p>Eröffnungssaldo per 1.1. und Bewertungsbuchung per 31.12. gemäss ESTV-Kursliste.</p></div>
+  </div>
+
+  <h2>So sieht das Ergebnis aus</h2>
+  <table>
+    <tr><th>Datum</th><th>Text</th><th>Soll</th><th>Haben</th><th class="n">CHF</th></tr>
+    <tr><td>14.03</td><td>Zahlungseingang Rechnung 2026-031, 0.00250000 BTC @ 68 400</td><td>1025 BTC</td><td>3200 Erlös</td><td class="n">171.00</td></tr>
+    <tr><td>02.05</td><td>Zahlung Lieferant, 0.00120000 BTC @ 71 050</td><td>4400 Aufwand</td><td>1025 BTC</td><td class="n">85.26</td></tr>
+    <tr><td>02.05</td><td>Netzwerkgebühr, 0.00000850 BTC</td><td>6940 Gebühren</td><td>1025 BTC</td><td class="n">0.60</td></tr>
+    <tr><td>31.12</td><td>Bewertung zum ESTV-Kurs</td><td>1025 BTC</td><td>6950 Kursgewinn</td><td class="n">12.40</td></tr>
+  </table>
+  <p class="note">Fiktives Beispiel zur Veranschaulichung. Konten und Kontenplan konfigurierbar.</p>
+
+  <h2>Ablauf</h2>
+  <ol>
+    <li>Sie senden uns die Adresse oder xpub der Wallet (nur Lesezugriff) und den Zeitraum.</li>
+    <li>Wir senden Ihnen die Importdatei (Banana oder CSV) und eine auf den Satoshi genau mit der Blockchain abgestimmte Übersicht.</li>
+    <li>Sie importieren und prüfen – fertig.</li>
+  </ol>
+  <p><strong>Pilotphase:</strong> Die ersten Dossiers bearbeiten wir kostenlos, gegen Ihr Feedback.</p>
+
+  <h2>Über uns</h2>
+  <p>CryptoCompta wird von SatsForge entwickelt, einem digitalen Kleinunternehmen aus der Schweiz. Die Kommunikation führt Shiro, ein KI-Agent unter menschlicher Aufsicht. Private Schlüssel oder Zugriffe, mit denen sich Geld ausgeben lässt, werden nie verlangt.</p>
+  <p>Kontakt: <a href="mailto:shiro260926@gmail.com">shiro260926@gmail.com</a></p>
+</section>
+
+</main>
+<footer>
+  <span data-l="fr">© 2026 CryptoCompta · SatsForge. Mentions légales en cours de publication.</span>
+  <span data-l="de">© 2026 CryptoCompta · SatsForge. Impressum in Vorbereitung.</span>
+</footer>
+<script>
+function setL(l){document.body.className=l;document.documentElement.lang=l;
+document.getElementById('bfr').className=l=='fr'?'on':'';document.getElementById('bde').className=l=='de'?'on':'';
+try{localStorage.setItem('l',l)}catch(e){}}
+(function(){var l=null;try{l=localStorage.getItem('l')}catch(e){}
+if(!l&&/^de/i.test(navigator.language||''))l='de';if(location.hash=='#de')l='de';if(l)setL(l)})();
+</script>
+</body>
+</html>
