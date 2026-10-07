@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bitcoin en comptabilité suisse : produire un journal CHF à partir d'un wallet — CryptoCompta</title>
+<meta name="description" content="Guide pratique pour fiduciaires et PME suisses : transformer les transactions d'un wallet bitcoin en écritures comptables CHF, avec les cours horodatés, les frais réseau, et la réévaluation 31.12 selon la Kursliste ESTV. Import direct dans Banana.">
+<meta name="keywords" content="bitcoin comptabilité suisse, journal CHF bitcoin, écritures BTC fiduciaire, Banana bitcoin, ESTV Kursliste bitcoin, comptabilisation cryptomonnaies PME suisse, xpub comptabilité">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cryptocompta.ch/blog/">
+<style>
+:root{--ink:#1d2433;--muted:#5b6475;--line:#e3e6ec;--accent:#c8102e;--bg:#fafbfc}
+*{box-sizing:border-box}body{margin:0;font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:#fff}
+header,article,footer{max-width:760px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;padding-top:22px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.3px}.logo span{color:var(--accent)}
+.logo a{text-decoration:none;color:inherit}
+header nav a{color:var(--muted);text-decoration:none;font-size:14px;margin-left:18px}
+header nav a:hover{color:var(--ink)}
+h1{font-size:30px;line-height:1.3;margin:40px 0 10px;letter-spacing:-.3px}
+.meta{font-size:14px;color:var(--muted);margin-bottom:30px}
+h2{font-size:21px;margin:36px 0 10px;padding-top:8px}
+h3{font-size:17px;margin:24px 0 8px}
+p{margin:0 0 16px}
+p.lead{font-size:18px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0 20px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+th{background:var(--bg);font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px 14px;font-size:13px;overflow-x:auto}
+code{font-family:"SF Mono",Consolas,"Liberation Mono",monospace;font-size:.9em}
+p code,li code{background:var(--bg);padding:1px 5px;border-radius:3px}
+ol,ul{margin:0 0 16px;padding-left:22px}
+ol li,ul li{margin-bottom:6px}
+.note{background:var(--bg);border-left:3px solid var(--accent);padding:12px 16px;margin:20px 0;font-size:14px;border-radius:0 6px 6px 0}
+.note p{margin:0}
+.cta{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:15px}
+.back{display:inline-block;color:var(--muted);text-decoration:none;font-size:14px;margin-bottom:20px}
+.back:hover{color:var(--ink)}
+footer{border-top:1px solid var(--line);margin-top:50px;padding-top:20px;padding-bottom:40px;font-size:13px;color:var(--muted)}
+[data-l]{display:none}body.fr [data-l=fr],body.de [data-l=de]{display:block}
+body.fr span[data-l=fr],body.de span[data-l=de]{display:inline}
+.lang button{border:1px solid var(--line);background:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font:inherit;font-size:14px}
+.lang button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+</style>
+</head>
+<body class="fr">
+<header>
+  <div class="logo"><a href="/">Crypto<span>Compta</span></a></div>
+  <div>
+    <span class="lang"><button id="bfr" class="on" onclick="setL('fr')">FR</button> <button id="bde" onclick="setL('de')">DE</button></span>
+  </div>
+</header>
+<article>
+
+<a class="back" href="/">&larr; Accueil</a>
+
+<section data-l="fr">
+  <h1>Bitcoin en comptabilité suisse : produire un journal CHF à partir d'un wallet</h1>
+  <p class="meta">Octobre 2026 · CryptoCompta · 7 min de lecture</p>
+
+  <p class="lead">Une PME suisse qui accepte le bitcoin ou une fiduciaire qui tient les comptes d'un client détenteur de BTC doit, à un moment, convertir chaque transaction en francs suisses pour le journal comptable. Ce guide explique comment automatiser cette conversion en respectant le cadre suisse, sans tableur ni saisie manuelle.</p>
+
+  <h2>Le problème : des transactions en BTC, une comptabilité en CHF</h2>
+  <p>Le droit suisse impose la tenue d'une comptabilité en francs (art. 957a CO). Une entreprise qui reçoit ou dépense des bitcoins doit donc, pour chaque transaction :</p>
+  <ol>
+    <li>Déterminer le cours BTC/CHF <strong>au moment exact</strong> de la transaction ;</li>
+    <li>Comptabiliser séparément les <strong>frais de réseau</strong> (mining fees), qui sont des charges ;</li>
+    <li>Identifier la <strong>monnaie rendue</strong> (change output) qui retourne au wallet émetteur — à ne pas confondre avec un paiement à un tiers ;</li>
+    <li>À la clôture annuelle, <strong>réévaluer</strong> les positions ouvertes au 31.12 selon la <strong>Kursliste de l'ESTV</strong> (art. 960b CO).</li>
+  </ol>
+  <p>Pour un wallet avec quelques transactions par mois, un comptable peut s'en sortir dans un tableur. Mais pour un portefeuille plus actif, la tâche devient rapidement chronophage et source d'erreurs.</p>
+
+  <h2>Le cadre légal suisse</h2>
+  <p>Le Code des obligations (art. 960a-960b CO) et les circulaires ESTV applicables donnent le canevas :</p>
+  <ul>
+    <li><strong>Art. 960a CO</strong> : évaluation au coût d'acquisition ou à la valeur du jour si des prix observables existent (cas du bitcoin).</li>
+    <li><strong>Art. 960b CO</strong> : réévaluation à la clôture, avec possibilité de réserve de fluctuation.</li>
+    <li><strong>Kursliste Kryptowährungen ESTV</strong> : publiée chaque année sur <a href="https://www.ictax.admin.ch/" target="_blank" rel="noopener">ictax.admin.ch</a>, elle donne le cours unique au 31.12 pour les principales cryptomonnaies (BTC 2025 : 69&nbsp;572 CHF). Les cantons l'utilisent pour l'impôt sur la fortune ; elle constitue une référence pour l'évaluation comptable de clôture.</li>
+    <li><strong>Frais réseau</strong> : considérés comme des frais bancaires (compte 6940), déductibles du bénéfice imposable. La pratique fiscale suisse est claire sur ce point.</li>
+  </ul>
+
+  <h2>La difficulté technique : un wallet, ce n'est pas un compte bancaire</h2>
+  <p>Contrairement à un relevé bancaire qui liste des entrées et sorties en CHF avec une date et un montant, un wallet bitcoin est un ensemble de transactions (UTXO) sur la blockchain. Chaque transaction peut avoir :</p>
+  <ul>
+    <li>Plusieurs sorties : certaines vont au destinataire, d'autres reviennent à l'émetteur (change).</li>
+    <li>Des frais implicites : la différence entre les entrées et les sorties d'une transaction.</li>
+    <li>Pas de taux de change : le wallet ne connaît que des satoshis.</li>
+  </ul>
+  <p>Pour produire une écriture comptable correcte, il faut donc : lire toutes les adresses du wallet (y compris le change interne), déterminer pour chaque transaction qui est l'émetteur et qui est le destinataire, appliquer le cours BTC/CHF du moment, et isoler les frais.</p>
+
+  <div class="note"><p><strong>Clé publique étendue (xpub/zpub)</strong> : une xpub permet de dériver toutes les adresses de réception et de change d'un wallet, en lecture seule. C'est exactement ce dont un comptable a besoin pour lire l'historique complet sans jamais pouvoir dépenser. Les wallets modernes (Ledger, Trezor, BTCPay Server, Sparrow) l'exportent en un clic.</p></div>
+
+  <h2>Exemple concret : du wallet au journal</h2>
+  <p>Prenons une PME qui reçoit un paiement client de 0.0025 BTC le 14 mars, puis paie un fournisseur 0.0012 BTC le 2 mai.</p>
+
+  <h3>Étape 1 : lecture des transactions</h3>
+  <p>La xpub du wallet est scannée. Le système identifie :</p>
+  <ul>
+    <li>14.03.2026 — réception de 0.00250000 BTC sur l'adresse de la PME (cours : 68&nbsp;400 CHF/BTC)</li>
+    <li>02.05.2026 — envoi de 0.00120000 BTC au fournisseur + 0.00000850 BTC de frais réseau (cours : 71&nbsp;050 CHF/BTC)</li>
+    <li>Le change de la 2e transaction (0.00029150 BTC) retourne au wallet : pas d'écriture.</li>
+  </ul>
+
+  <h3>Étape 2 : écritures comptables générées</h3>
+  <table>
+    <tr><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th class="n">CHF</th></tr>
+    <tr><td>14.03.2026</td><td>Encaissement facture 2026-031, 0.00250000 BTC @ 68&nbsp;400</td><td>1025 BTC</td><td>3200 Ventes</td><td class="n">171.00</td></tr>
+    <tr><td>02.05.2026</td><td>Paiement fournisseur, 0.00120000 BTC @ 71&nbsp;050</td><td>4400 Achats</td><td>1025 BTC</td><td class="n">85.26</td></tr>
+    <tr><td>02.05.2026</td><td>Frais réseau, 0.00000850 BTC</td><td>6940 Frais</td><td>1025 BTC</td><td class="n">0.60</td></tr>
+  </table>
+
+  <h3>Étape 3 : clôture au 31.12</h3>
+  <table>
+    <tr><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th class="n">CHF</th></tr>
+    <tr><td>01.01.2026</td><td>Solde d'ouverture, 0.00100000 BTC @ 69&nbsp;572 (ESTV)</td><td>1025 BTC</td><td>2990 Solde ouverture</td><td class="n">69.57</td></tr>
+    <tr><td>31.12.2026</td><td>Réévaluation au cours ESTV, 0.00120850 BTC @ 72&nbsp;100</td><td>1025 BTC</td><td>6950 Gain de change</td><td class="n">3.05</td></tr>
+  </table>
+
+  <p>Le fichier produit est au format Banana (<em>Fichier texte avec en-têtes de colonnes</em>) : TAB-separated, colonnes NameXml, importable en deux clics. Pour bexio et Abacus, un CSV générique avec les colonnes attendues est également généré.</p>
+
+  <h2>Les pièges à éviter</h2>
+  <ol>
+    <li><strong>Ne scanner que les adresses visibles</strong> : les wallets HD (standard actuel) génèrent des adresses de change internes. Si on ne scanne que les adresses fournies manuellement, on comptabilise le change comme un paiement → erreur dans les comptes.</li>
+    <li><strong>Prendre le cours du jour au lieu du cours de la transaction</strong> : le cours BTC/CHF peut varier de 2 à 5 % en une journée. L'AFC attend le cours au moment de la transaction.</li>
+    <li><strong>Oublier les frais réseau</strong> : ils sont déductibles. Une PME avec 50 transactions par an peut perdre 50–100 CHF de charges non comptabilisées.</li>
+    <li><strong>Réévaluer au cours du 31.12 au lieu de la Kursliste ESTV</strong> : la liste officielle de l'ESTV fait foi. Les cours des exchanges peuvent différer de 0.5–2 %.</li>
+  </ol>
+
+  <h2>Combien de temps ça prend (et combien ça coûte)</h2>
+  <p>Une fiduciaire que nous avons interrogée nous a confié passer <strong>2 à 4 heures par dossier et par an</strong> à retraiter manuellement les transactions bitcoin d'un client PME, entre l'extraction, la vérification des cours, le rapprochement et la saisie. À 150–250 CHF/h, c'est 300 à 1&nbsp;000 CHF de coût interne par dossier — sans compter le risque d'erreur.</p>
+  <p>Automatiser cette étape libère du temps pour le conseil à valeur ajoutée : structuration fiscale, choix du mode de garde, optimisation de la trésorerie.</p>
+
+  <h2>Et concrètement, vous faites comment ?</h2>
+  <p>CryptoCompta est un outil développé en Suisse pour répondre exactement à ce besoin. Le processus est simple :</p>
+  <ol>
+    <li>Vous nous transmettez la xpub/zpub (lecture seule) du wallet et la période.</li>
+    <li>Nous vous renvoyons le journal CHF au format Banana ou CSV, avec un rapprochement au satoshi près vérifié sur la blockchain.</li>
+    <li>Vous importez, vous contrôlez, c'est terminé.</li>
+  </ol>
+  <p><strong>Phase pilote :</strong> le premier dossier est traité gratuitement, en échange de votre retour sur le format et les besoins spécifiques de votre cabinet.</p>
+
+  <p style="margin-top:30px">
+    <a class="cta" href="mailto:contact@cryptocompta.ch?subject=Journal%20CHF%20-%20exemple%20d'export">Recevoir un exemple d'export</a>
+  </p>
+</section>
+
+<section data-l="de">
+  <h1>Bitcoin in der Schweizer Buchhaltung: ein CHF-Journal aus einer Wallet erzeugen</h1>
+  <p class="meta">Oktober 2026 · CryptoCompta · 7 Min. Lesezeit</p>
+
+  <p class="lead">Ein Schweizer KMU, das Bitcoin akzeptiert, oder ein Treuhänder, der die Bücher eines Kunden mit BTC-Beständen führt, muss früher oder später jede Transaktion für das Buchungsjournal in Schweizer Franken umrechnen. Dieser Leitfaden erklärt, wie sich dieser Prozess automatisieren lässt — unter Einhaltung des Schweizer Rechtsrahmens, ohne Tabellenkalkulation und manuelle Erfassung.</p>
+
+  <h2>Das Problem: Transaktionen in BTC, Buchhaltung in CHF</h2>
+  <p>Das Schweizer Recht schreibt eine Buchführung in Franken vor (Art. 957a OR). Ein Unternehmen, das Bitcoin erhält oder ausgibt, muss daher für jede Transaktion:</p>
+  <ol>
+    <li>Den BTC/CHF-Kurs <strong>zum genauen Zeitpunkt</strong> der Transaktion ermitteln;</li>
+    <li>Die <strong>Netzwerkgebühren</strong> (Mining Fees) separat als Aufwand verbuchen;</li>
+    <li>Das <strong>Wechselgeld</strong> (Change Output) erkennen, das an die eigene Wallet zurückfliesst — nicht zu verwechseln mit einer Zahlung an Dritte;</li>
+    <li>Zum Jahresabschluss die offenen Positionen per 31.12. gemäss der <strong>ESTV-Kursliste</strong> neu bewerten (Art. 960b OR).</li>
+  </ol>
+  <p>Bei einer Wallet mit wenigen Transaktionen pro Monat mag eine Tabellenkalkulation genügen. Bei einem aktiveren Portfolio wird die Aufgabe jedoch schnell zeitaufwändig und fehleranfällig.</p>
+
+  <h2>Der Schweizer Rechtsrahmen</h2>
+  <p>Obligationenrecht (Art. 960a–960b OR) und anwendbare ESTV-Rundschreiben geben den Rahmen vor:</p>
+  <ul>
+    <li><strong>Art. 960a OR</strong>: Bewertung zu Anschaffungskosten oder zum Tageswert, wenn beobachtbare Preise existieren (bei Bitcoin der Fall).</li>
+    <li><strong>Art. 960b OR</strong>: Neubewertung zum Abschlussstichtag, mit Möglichkeit einer Schwankungsreserve.</li>
+    <li><strong>ESTV-Kursliste Kryptowährungen</strong>: jährlich publiziert auf <a href="https://www.ictax.admin.ch/" target="_blank" rel="noopener">ictax.admin.ch</a>, enthält den Einheitskurs per 31.12. für die wichtigsten Kryptowährungen (BTC 2025: 69&nbsp;572 CHF). Die Kantone nutzen sie für die Vermögenssteuer; sie dient als Referenz für die buchhalterische Schlussbewertung.</li>
+    <li><strong>Netzwerkgebühren</strong>: gelten als Bankspesen (Konto 6940), vom steuerbaren Gewinn abziehbar. Die Schweizer Steuerpraxis ist hier eindeutig.</li>
+  </ul>
+
+  <h2>Die technische Schwierigkeit: eine Wallet ist kein Bankkonto</h2>
+  <p>Anders als ein Kontoauszug, der Ein- und Ausgänge in CHF mit Datum und Betrag auflistet, ist eine Bitcoin-Wallet eine Sammlung von Transaktionen (UTXOs) auf der Blockchain. Jede Transaktion kann Folgendes enthalten:</p>
+  <ul>
+    <li>Mehrere Ausgänge: einige gehen an den Empfänger, andere zurück an den Sender (Change).</li>
+    <li>Implizite Gebühren: die Differenz zwischen Eingängen und Ausgängen einer Transaktion.</li>
+    <li>Keinen Wechselkurs: die Wallet kennt nur Satoshis.</li>
+  </ul>
+  <p>Für eine korrekte Buchung braucht es daher: alle Adressen der Wallet (inklusive internem Change) lesen, für jede Transaktion Sender und Empfänger bestimmen, den BTC/CHF-Kurs zum Zeitpunkt anwenden und die Gebühren isolieren.</p>
+
+  <div class="note"><p><strong>Erweiterter öffentlicher Schlüssel (xpub/zpub)</strong>: Ein xpub leitet alle Empfangs- und Change-Adressen einer Wallet ab, aber nur lesend. Genau das braucht ein Treuhänder, um die vollständige Historie einzusehen — ohne jemals Geld ausgeben zu können. Moderne Wallets (Ledger, Trezor, BTCPay Server, Sparrow) exportieren ihn mit einem Klick.</p></div>
+
+  <h2>Konkretes Beispiel: von der Wallet ins Journal</h2>
+  <p>Nehmen wir ein KMU, das am 14. März eine Kundenzahlung über 0.0025 BTC erhält und am 2. Mai einen Lieferanten mit 0.0012 BTC bezahlt.</p>
+
+  <h3>Schritt 1: Transaktionen auslesen</h3>
+  <p>Der xpub der Wallet wird gescannt. Das System identifiziert:</p>
+  <ul>
+    <li>14.03.2026 — Eingang 0.00250000 BTC auf die KMU-Adresse (Kurs: 68&nbsp;400 CHF/BTC)</li>
+    <li>02.05.2026 — Ausgang 0.00120000 BTC an den Lieferanten + 0.00000850 BTC Netzwerkgebühr (Kurs: 71&nbsp;050 CHF/BTC)</li>
+    <li>Wechselgeld der 2. Transaktion (0.00029150 BTC) fliesst an die eigene Wallet zurück: keine Buchung.</li>
+  </ul>
+
+  <h3>Schritt 2: generierte Buchungen</h3>
+  <table>
+    <tr><th>Datum</th><th>Text</th><th>Soll</th><th>Haben</th><th class="n">CHF</th></tr>
+    <tr><td>14.03.2026</td><td>Zahlungseingang Rechnung 2026-031, 0.00250000 BTC @ 68&nbsp;400</td><td>1025 BTC</td><td>3200 Erlös</td><td class="n">171.00</td></tr>
+    <tr><td>02.05.2026</td><td>Zahlung Lieferant, 0.00120000 BTC @ 71&nbsp;050</td><td>4400 Aufwand</td><td>1025 BTC</td><td class="n">85.26</td></tr>
+    <tr><td>02.05.2026</td><td>Netzwerkgebühr, 0.00000850 BTC</td><td>6940 Gebühren</td><td>1025 BTC</td><td class="n">0.60</td></tr>
+  </table>
+
+  <h3>Schritt 3: Abschluss per 31.12.</h3>
+  <table>
+    <tr><th>Datum</th><th>Text</th><th>Soll</th><th>Haben</th><th class="n">CHF</th></tr>
+    <tr><td>01.01.2026</td><td>Eröffnungssaldo, 0.00100000 BTC @ 69&nbsp;572 (ESTV)</td><td>1025 BTC</td><td>2990 Eröffnung</td><td class="n">69.57</td></tr>
+    <tr><td>31.12.2026</td><td>Bewertung zum ESTV-Kurs, 0.00120850 BTC @ 72&nbsp;100</td><td>1025 BTC</td><td>6950 Kursgewinn</td><td class="n">3.05</td></tr>
+  </table>
+
+  <p>Die erzeugte Datei liegt im Banana-Format vor (<em>Textdatei mit Spaltenüberschriften</em>): TAB-getrennt, NameXml-Spalten, mit zwei Klicks importierbar. Für bexio und Abacus wird ebenfalls ein generisches CSV mit den erwarteten Spalten erstellt.</p>
+
+  <h2>Die häufigsten Fallstricke</h2>
+  <ol>
+    <li><strong>Nur sichtbare Adressen scannen</strong>: HD-Wallets (heutiger Standard) generieren interne Change-Adressen. Ohne vollständigen xpub-Scan wird Wechselgeld fälschlich als Zahlung verbucht → Fehler in der Buchhaltung.</li>
+    <li><strong>Tageskurs statt Transaktionskurs</strong>: Der BTC/CHF-Kurs kann an einem Tag um 2–5 % schwanken. Die ESTV erwartet den Kurs zum Transaktionszeitpunkt.</li>
+    <li><strong>Netzwerkgebühren vergessen</strong>: Sie sind abziehbar. Ein KMU mit 50 Transaktionen pro Jahr kann 50–100 CHF nicht verbuchten Aufwand verlieren.</li>
+    <li><strong>Bewertung zum 31.12.-Börsenkurs statt ESTV-Kursliste</strong>: Die amtliche ESTV-Liste ist massgebend. Börsenkurse können um 0,5–2 % abweichen.</li>
+  </ol>
+
+  <h2>Wie viel Zeit kostet das (und was kostet das)?</h2>
+  <p>Ein von uns befragtes Treuhandbüro gab an, <strong>2 bis 4 Stunden pro Mandat und Jahr</strong> für die manuelle Aufbereitung der Bitcoin-Transaktionen eines KMU-Kunden aufzuwenden — Extraktion, Kursprüfung, Abgleich und Erfassung. Bei 150–250 CHF/h sind das 300 bis 1&nbsp;000 CHF interne Kosten pro Mandat — das Fehlerrisiko nicht eingerechnet.</p>
+  <p>Die Automatisierung dieses Schrittes schafft Zeit für wertschöpfende Beratung: steuerliche Strukturierung, Wahl der Verwahrungsart, Liquiditätsoptimierung.</p>
+
+  <h2>Und wie macht man das konkret?</h2>
+  <p>CryptoCompta ist ein in der Schweiz entwickeltes Tool, das genau diesen Bedarf deckt. Der Ablauf ist einfach:</p>
+  <ol>
+    <li>Sie senden uns den xpub/zpub (nur Leserecht) der Wallet und den Zeitraum.</li>
+    <li>Wir senden Ihnen das CHF-Journal im Banana- oder CSV-Format, mit einem auf den Satoshi genauen Blockchain-Abgleich.</li>
+    <li>Sie importieren, prüfen — fertig.</li>
+  </ol>
+  <p><strong>Pilotphase:</strong> das erste Mandat bearbeiten wir kostenlos, gegen Ihr Feedback zu Format und spezifischen Anforderungen Ihres Büros.</p>
+
+  <p style="margin-top:30px">
+    <a class="cta" href="mailto:contact@cryptocompta.ch?subject=Journal%20CHF%20-%20Beispiel-Export">Beispiel-Export anfordern</a>
+  </p>
+</section>
+
+</article>
+<footer>
+  <span data-l="fr">© 2026 CryptoCompta · SatsForge. Article publié sur <a href="/">cryptocompta.ch</a>. <a href="mailto:contact@cryptocompta.ch">contact@cryptocompta.ch</a></span>
+  <span data-l="de">© 2026 CryptoCompta · SatsForge. Artikel veröffentlicht auf <a href="/">cryptocompta.ch</a>. <a href="mailto:contact@cryptocompta.ch">contact@cryptocompta.ch</a></span>
+</footer>
+<script>
+function setL(l){document.body.className=l;document.documentElement.lang=l;
+document.getElementById('bfr').className=l=='fr'?'on':'';document.getElementById('bde').className=l=='de'?'on':'';
+try{localStorage.setItem('l',l)}catch(e){}}
+(function(){var l=null;try{l=localStorage.getItem('l')}catch(e){}
+if(!l&&/^de/i.test(navigator.language||''))l='de';if(location.hash=='#de')l='de';if(l)setL(l)})();
+</script>
+</body>
+</html>
